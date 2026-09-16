@@ -24,7 +24,7 @@ return new class extends Migration
                 ->nullable();
 
             $table->unsignedInteger('total_units')
-                ->default(0);
+                ->nullable();
 
             $table->timestamps();
         });

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'name',
@@ -32,5 +33,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function managedBuildings(): HasMany
+    {
+        return $this->hasMany(Building::class, 'manager_id');
+    }
+
+    public function apartments(): HasMany
+    {
+        return $this->hasMany(Apartment::class, 'resident_id');
     }
 }
