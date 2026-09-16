@@ -50,6 +50,12 @@
             </div>
         </section>
     @else
+        <a href="{{ route('buildings.index') }}" wire:navigate class="module-link">
+            <div class="card-icon blue">⌂</div>
+            <div><strong>مدیریت ساختمان‌ها</strong><span>مشاهده، افزودن و ویرایش ساختمان‌ها</span></div>
+            <b>‹</b>
+        </a>
+
         <section class="stats-grid manager-grid" aria-label="خلاصه وضعیت مدیریت">
             <article class="stat-card"><div class="card-icon blue">⌂</div><span>ساختمان‌ها</span><strong>{{ $this->number($dashboard['buildings_count'] ?? 0) }}</strong><small>ساختمان تحت مدیریت</small></article>
             <article class="stat-card"><div class="card-icon green">▦</div><span>واحدها</span><strong>{{ $this->number($dashboard['apartments_count'] ?? 0) }}</strong><small>واحد ثبت‌شده</small></article>
@@ -58,7 +64,7 @@
         </section>
 
         @if (($dashboard['buildings_count'] ?? 0) === 0)
-            <section class="empty-state large"><strong>هنوز ساختمانی ثبت نشده است.</strong><span>امکان افزودن ساختمان در فاز بعدی فعال می‌شود.</span></section>
+            <section class="empty-state large"><strong>هنوز ساختمانی ثبت نشده است.</strong><span>از بخش مدیریت ساختمان‌ها اولین ساختمان را اضافه کنید.</span></section>
         @endif
     @endif
 

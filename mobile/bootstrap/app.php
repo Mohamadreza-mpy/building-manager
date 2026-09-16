@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureManagementRole;
 use App\Http\Middleware\EnsureMobileAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'mobile.auth' => EnsureMobileAuthenticated::class,
+            'mobile.management' => EnsureManagementRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

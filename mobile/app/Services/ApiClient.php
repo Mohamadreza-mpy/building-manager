@@ -28,6 +28,16 @@ class ApiClient
         return $this->request('POST', $uri, ['json' => $data]);
     }
 
+    public function put(string $uri, array $data = []): ApiResponse
+    {
+        return $this->request('PUT', $uri, ['json' => $data]);
+    }
+
+    public function delete(string $uri): ApiResponse
+    {
+        return $this->request('DELETE', $uri, []);
+    }
+
     private function request(string $method, string $uri, array $options): ApiResponse
     {
         try {

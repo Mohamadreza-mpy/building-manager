@@ -32,6 +32,8 @@ class Home extends Component
         }
 
         $this->loadDashboard($dashboardService);
+
+        $this->errorMessage ??= session()->pull('error_message');
     }
 
     public function refreshDashboard(DashboardService $dashboardService): void
