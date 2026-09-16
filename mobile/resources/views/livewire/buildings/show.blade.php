@@ -19,6 +19,12 @@
             </dl>
         </section>
 
+        <a href="{{ route('apartments.index', $buildingId) }}" wire:navigate class="module-link detail-module-link">
+            <div class="card-icon green">▦</div>
+            <div><strong>مدیریت واحدها</strong><span>مشاهده و ثبت واحدهای این ساختمان</span></div>
+            <b>‹</b>
+        </a>
+
         <section class="danger-zone">
             @if ($confirmingDelete)
                 <p>از حذف «{{ $item['name'] }}» مطمئن هستید؟ این عملیات قابل بازگشت نیست.</p>
