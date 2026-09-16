@@ -3,105 +3,40 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(private AuthService $service) {}
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+        $result = $this->service->register($request->validated());
 
-            'mobile' => [
-                'required',
-                'string',
-                'unique:users,mobile'
-            ],
-
-            'password' => [
-                'required',
-                'min:6'
-            ],
-        ]);
-
-
-        $user = User::create([
-            'name' => $data['name'],
-            'mobile' => $data['mobile'],
-            'password' => $data['password'],
-            'role' => 'resident',
-        ]);
-
-
-        $token = $user->createToken('mobile-app')->plainTextToken;
-
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
+        return response()->json(['success' => true, 'message' => 'ثبت‌نام با موفقیت انجام شد.', 'data' => ['user' => new UserResource($result['user']), 'token' => $result['token']]], 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'mobile' => [
-                'required',
-                'string'
-            ],
+        $result = $this->service->login($request->validated());
 
-            'password' => [
-                'required'
-            ],
-        ]);
-
-
-        $user = User::where('mobile', $data['mobile'])
-            ->first();
-
-
-        if (!$user || !Hash::check($data['password'], $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-
-
-        $token = $user->createToken('mobile-app')->plainTextToken;
-
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return response()->json(['success' => true, 'message' => 'ورود با موفقیت انجام شد.', 'data' => ['user' => new UserResource($result['user']), 'token' => $result['token']]]);
     }
 
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
-        return response()->json([
-            'user' => $request->user()
-        ]);
+        return response()->json(['success' => true, 'message' => 'اطلاعات کاربر دریافت شد.', 'data' => new UserResource($request->user())]);
     }
 
-
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()
-            ->currentAccessToken()
-            ->delete();
+        $this->service->logout($request->user());
 
-
-        return response()->json([
-            'message'=>'خروج با موفقیت انجام شد'
-        ]);
+        return response()->json(['success' => true, 'message' => 'خروج با موفقیت انجام شد.', 'data' => null]);
     }
-
-
 }

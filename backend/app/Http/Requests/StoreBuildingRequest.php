@@ -12,29 +12,27 @@ class StoreBuildingRequest extends FormRequest
         return $this->user()?->can('create', Building::class) ?? false;
     }
 
-
     public function rules(): array
     {
         return [
             'name' => [
                 'required',
                 'string',
-                'max:100'
+                'max:100',
             ],
 
             'address' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'total_units' => [
                 'nullable',
                 'integer',
-                'min:1'
+                'min:1',
             ],
         ];
     }
-
 
     public function messages(): array
     {
@@ -49,7 +47,6 @@ class StoreBuildingRequest extends FormRequest
             'total_units.min' => 'تعداد واحدها باید حداقل ۱ باشد.',
         ];
     }
-
 
     public function attributes(): array
     {

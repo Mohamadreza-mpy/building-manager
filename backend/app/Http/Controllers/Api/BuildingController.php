@@ -14,11 +14,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BuildingController extends Controller
 {
-
     public function __construct(
         private BuildingService $service
     ) {}
-
 
     public function index(Request $request): AnonymousResourceCollection
     {

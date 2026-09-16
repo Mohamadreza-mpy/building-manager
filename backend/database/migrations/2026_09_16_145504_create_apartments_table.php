@@ -19,22 +19,18 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-
             $table->foreignId('resident_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 
-
-            $table->string('number',20);
+            $table->string('number', 20);
 
             $table->integer('floor')
                 ->nullable();
 
-
-            $table->decimal('area',8,2)
+            $table->decimal('area', 8, 2)
                 ->nullable();
-
 
             $table->timestamps();
 
