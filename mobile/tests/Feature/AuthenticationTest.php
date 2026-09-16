@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Contracts\TokenStorage;
 use App\Livewire\Auth\Login;
 use App\Services\AuthService;
+use App\Services\SecureTokenStorage;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\Support\InMemoryTokenStorage;
@@ -29,6 +30,20 @@ class AuthenticationTest extends TestCase
             ->assertOk()
             ->assertSee('ورود به حساب کاربری')
             ->assertSee('شماره موبایل');
+    }
+
+    public function test_browser_preview_uses_session_storage_instead_of_native_bridge(): void
+    {
+        config(['nativephp-internal.running' => false]);
+        $storage = new SecureTokenStorage;
+
+        $storage->store('browser-token');
+
+        $this->assertSame('browser-token', $storage->get());
+
+        $storage->forget();
+
+        $this->assertNull($storage->get());
     }
 
     public function test_user_can_login_through_backend_api(): void

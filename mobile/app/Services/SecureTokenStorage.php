@@ -12,7 +12,7 @@ class SecureTokenStorage implements TokenStorage
 
     public function get(): ?string
     {
-        if (function_exists('nativephp_call')) {
+        if ($this->isNativeRuntime()) {
             return SecureStorage::get(self::KEY);
         }
 
@@ -21,7 +21,7 @@ class SecureTokenStorage implements TokenStorage
 
     public function store(string $token): void
     {
-        if (function_exists('nativephp_call')) {
+        if ($this->isNativeRuntime()) {
             if (! SecureStorage::set(self::KEY, $token)) {
                 throw new RuntimeException('ذخیره امن نشست کاربری انجام نشد.');
             }
@@ -34,12 +34,18 @@ class SecureTokenStorage implements TokenStorage
 
     public function forget(): void
     {
-        if (function_exists('nativephp_call')) {
+        if ($this->isNativeRuntime()) {
             SecureStorage::delete(self::KEY);
 
             return;
         }
 
         session()->forget(self::KEY);
+    }
+
+    private function isNativeRuntime(): bool
+    {
+        return (bool) config('nativephp-internal.running', false)
+            || getenv('JUMP_BRIDGE_PORT') !== false;
     }
 }

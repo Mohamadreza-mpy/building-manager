@@ -6,6 +6,7 @@ use App\Contracts\TokenStorage;
 use App\Exceptions\ApiException;
 use App\Models\User;
 use App\State\AuthState;
+use RuntimeException;
 
 class AuthService
 {
@@ -27,7 +28,11 @@ class AuthService
         }
 
         $user = User::fromArray($response->data['user']);
-        $this->tokenStorage->store((string) $response->data['token']);
+        try {
+            $this->tokenStorage->store((string) $response->data['token']);
+        } catch (RuntimeException $exception) {
+            throw new ApiException($exception->getMessage());
+        }
         $this->state->setUser($user);
 
         return $user;
