@@ -37,6 +37,9 @@ return new class extends Migration
 
 
             $table->timestamps();
+
+            $table->unique(['building_id', 'number']);
+            $table->index(['resident_id', 'building_id']);
         });
     }
 

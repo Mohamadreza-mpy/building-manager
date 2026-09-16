@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'building_id',
@@ -26,13 +27,13 @@ class Apartment extends Model
     }
 
 
-    public function building()
+    public function building(): BelongsTo
     {
         return $this->belongsTo(Building::class);
     }
 
 
-    public function resident()
+    public function resident(): BelongsTo
     {
         return $this->belongsTo(User::class, 'resident_id');
     }
