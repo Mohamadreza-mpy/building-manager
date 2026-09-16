@@ -9,6 +9,7 @@ use App\Http\ApiResponse;
 use App\State\AuthState;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class ApiClient
@@ -38,6 +39,31 @@ class ApiClient
         return $this->request('DELETE', $uri, []);
     }
 
+    public function postMultipart(string $uri, array $data, ?string $filePath = null, ?string $mimeType = null, ?string $fileName = null): ApiResponse
+    {
+        $request = $this->client(json: false);
+
+        if ($filePath) {
+            $stream = fopen($filePath, 'r');
+
+            if ($stream === false) {
+                throw new ApiException('تصویر رسید قابل خواندن نیست.');
+            }
+
+            $request->attach('image', $stream, $fileName ?? basename($filePath), [
+                'Content-Type' => $mimeType ?? 'image/jpeg',
+            ]);
+        }
+
+        try {
+            $response = $request->post(ltrim($uri, '/'), $data);
+        } catch (ConnectionException) {
+            throw new ApiException('ارتباط با سرور برقرار نشد. اتصال اینترنت و آدرس سرور را بررسی کنید.');
+        }
+
+        return $this->parseResponse($response);
+    }
+
     private function request(string $method, string $uri, array $options): ApiResponse
     {
         try {
@@ -46,6 +72,11 @@ class ApiClient
             throw new ApiException('ارتباط با سرور برقرار نشد. اتصال اینترنت و آدرس سرور را بررسی کنید.');
         }
 
+        return $this->parseResponse($response);
+    }
+
+    private function parseResponse(Response $response): ApiResponse
+    {
         $payload = $response->json();
         $payload = is_array($payload) ? $payload : [];
 
@@ -75,12 +106,15 @@ class ApiClient
         );
     }
 
-    private function client(): PendingRequest
+    private function client(bool $json = true): PendingRequest
     {
         $request = Http::baseUrl((string) config('api.base_url'))
             ->acceptJson()
-            ->asJson()
             ->timeout((int) config('api.timeout'));
+
+        if ($json) {
+            $request->asJson();
+        }
 
         $token = $this->tokenStorage->get();
 

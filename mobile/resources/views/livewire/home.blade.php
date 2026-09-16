@@ -25,6 +25,13 @@
             <div><strong>شارژهای من</strong><span>مشاهده مبالغ و وضعیت پرداخت</span></div>
             <b>‹</b>
         </a>
+        @if($dashboard['current_apartment']['building']['id'] ?? null)
+            <a href="{{ route('expenses.index', $dashboard['current_apartment']['building']['id']) }}" wire:navigate class="module-link">
+                <div class="card-icon rose">−</div>
+                <div><strong>هزینه‌های ساختمان</strong><span>مشاهده هزینه‌ها و رسیدها</span></div>
+                <b>‹</b>
+            </a>
+        @endif
 
         <section class="apartment-hero">
             @if ($dashboard['current_apartment'] ?? null)
