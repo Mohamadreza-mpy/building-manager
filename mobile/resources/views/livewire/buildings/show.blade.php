@@ -24,6 +24,11 @@
             <div><strong>مدیریت واحدها</strong><span>مشاهده و ثبت واحدهای این ساختمان</span></div>
             <b>‹</b>
         </a>
+        <a href="{{ route('charges.index', $buildingId) }}" wire:navigate class="module-link detail-module-link charge-module-link">
+            <div class="card-icon amber">﷼</div>
+            <div><strong>مدیریت شارژها</strong><span>ثبت و مشاهده شارژهای ساختمان</span></div>
+            <b>‹</b>
+        </a>
 
         <section class="danger-zone">
             @if ($confirmingDelete)

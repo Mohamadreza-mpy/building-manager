@@ -20,6 +20,12 @@
     @endif
 
     @if ($isResident)
+        <a href="{{ route('charges.mine') }}" wire:navigate class="module-link">
+            <div class="card-icon amber">﷼</div>
+            <div><strong>شارژهای من</strong><span>مشاهده مبالغ و وضعیت پرداخت</span></div>
+            <b>‹</b>
+        </a>
+
         <section class="apartment-hero">
             @if ($dashboard['current_apartment'] ?? null)
                 <div class="card-icon blue">⌂</div>
