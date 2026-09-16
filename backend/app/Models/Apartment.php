@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+#[Fillable([
+    'building_id',
+    'resident_id',
+    'number',
+    'floor',
+    'area',
+])]
+class Apartment extends Model
+{
+    use HasFactory;
+
+
+    protected function casts(): array
+    {
+        return [
+            'area' => 'decimal:2',
+        ];
+    }
+
+
+    public function building()
+    {
+        return $this->belongsTo(Building::class);
+    }
+
+
+    public function resident()
+    {
+        return $this->belongsTo(User::class, 'resident_id');
+    }
+}
