@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ApartmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BuildingController;
 use App\Http\Controllers\Api\ChargeController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ReportController;
@@ -21,6 +22,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard', DashboardController::class);
     Route::apiResource('buildings', BuildingController::class);
     Route::get('/buildings/{building}/apartments', [ApartmentController::class, 'index']);
     Route::post('/buildings/{building}/apartments', [ApartmentController::class, 'store']);
