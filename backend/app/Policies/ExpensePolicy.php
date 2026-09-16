@@ -14,7 +14,7 @@ class ExpensePolicy
 
     public function viewAny(User $user, Building $building): bool
     {
-        return ($user->role === 'manager' && $building->manager_id === $user->id) || $building->apartments()->where('resident_id', $user->id)->exists();
+        return $user->role === 'manager' && $building->manager_id === $user->id;
     }
 
     public function create(User $user, Building $building): bool
