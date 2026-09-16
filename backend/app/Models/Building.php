@@ -18,7 +18,6 @@ class Building extends Model
 {
     use HasFactory;
 
-
     protected function casts(): array
     {
         return ['total_units' => 'integer'];
@@ -29,9 +28,23 @@ class Building extends Model
         return $this->belongsTo(User::class, 'manager_id');
     }
 
-
     public function apartments(): HasMany
     {
         return $this->hasMany(Apartment::class);
+    }
+
+    public function charges(): HasMany
+    {
+        return $this->hasMany(Charge::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
     }
 }
