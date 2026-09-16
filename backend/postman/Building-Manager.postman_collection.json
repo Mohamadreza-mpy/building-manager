@@ -1,0 +1,238 @@
+{
+  "info": {
+    "_postman_id": "8d5f19b1-7675-4e7c-a13f-0daf378bbb8a",
+    "name": "Building Manager API",
+    "description": "مجموعه کامل تست API پروژه Building Manager. ابتدا پوشه Authentication و درخواست Login as Manager را اجرا کنید. اسکریپت‌های مجموعه توکن‌ها و شناسه‌های ایجادشده را خودکار ذخیره می‌کنند.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('پاسخ JSON است', function () { pm.response.to.be.json; });",
+          "pm.test('پاسخ دارای success است', function () { pm.expect(pm.response.json()).to.have.property('success'); });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api" },
+    { "key": "token", "value": "" },
+    { "key": "manager_token", "value": "" },
+    { "key": "resident_token", "value": "" },
+    { "key": "admin_token", "value": "" },
+    { "key": "building_id", "value": "1" },
+    { "key": "apartment_id", "value": "1" },
+    { "key": "resident_id", "value": "3" },
+    { "key": "charge_id", "value": "1" },
+    { "key": "request_id", "value": "1" },
+    { "key": "notification_id", "value": "" }
+    ,{ "key": "registration_mobile", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 - Authentication",
+      "item": [
+        {
+          "name": "Register Resident",
+          "auth": { "type": "noauth" },
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"کاربر آزمایشی\",\n  \"mobile\": \"{{registration_mobile}}\",\n  \"email\": null,\n  \"password\": \"123456\",\n  \"password_confirmation\": \"123456\"\n}" },
+            "url": "{{base_url}}/auth/register"
+          },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["const mobile = '09' + Array.from({length: 9}, () => Math.floor(Math.random() * 10)).join('');", "pm.collectionVariables.set('registration_mobile', mobile);"] } }]
+        },
+        {
+          "name": "Login as Manager",
+          "auth": { "type": "noauth" },
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mobile\": \"09120000002\",\n  \"password\": \"123456\"\n}" },
+            "url": "{{base_url}}/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) { pm.collectionVariables.set('manager_token', json.data.token); pm.collectionVariables.set('token', json.data.token); }"] } }]
+        },
+        {
+          "name": "Login as Resident",
+          "auth": { "type": "noauth" },
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mobile\": \"09120000003\",\n  \"password\": \"123456\"\n}" },
+            "url": "{{base_url}}/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) { pm.collectionVariables.set('resident_token', json.data.token); pm.collectionVariables.set('resident_id', json.data.user.id); pm.collectionVariables.set('token', json.data.token); }"] } }]
+        },
+        {
+          "name": "Login as Admin",
+          "auth": { "type": "noauth" },
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mobile\": \"09120000001\",\n  \"password\": \"123456\"\n}" },
+            "url": "{{base_url}}/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) { pm.collectionVariables.set('admin_token', json.data.token); pm.collectionVariables.set('token', json.data.token); }"] } }]
+        },
+        {
+          "name": "Set Active Token to Manager",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/auth/me" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        },
+        {
+          "name": "Me",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/auth/me" }
+        },
+        {
+          "name": "Logout Current Token",
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/auth/logout" }
+        }
+      ]
+    },
+    {
+      "name": "02 - Buildings",
+      "item": [
+        {
+          "name": "Create Building",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"ساختمان آفتاب\",\n  \"address\": \"تهران، خیابان آزادی\",\n  \"total_units\": 12\n}" },
+            "url": "{{base_url}}/buildings"
+          },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }, { "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) pm.collectionVariables.set('building_id', json.data.id);"] } }]
+        },
+        { "name": "List Buildings", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings" } },
+        { "name": "Show Building", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}" } },
+        {
+          "name": "Update Building",
+          "request": { "method": "PUT", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"ساختمان آفتاب ویرایش‌شده\",\n  \"total_units\": 14\n}" }, "url": "{{base_url}}/buildings/{{building_id}}" }
+        },
+        { "name": "Delete Building (run last)", "request": { "method": "DELETE", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}" } }
+      ]
+    },
+    {
+      "name": "03 - Apartments",
+      "item": [
+        {
+          "name": "Create Apartment and Assign Resident",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"resident_id\": {{resident_id}},\n  \"number\": \"101\",\n  \"floor\": 1,\n  \"area\": 85.5\n}" },
+            "url": "{{base_url}}/buildings/{{building_id}}/apartments"
+          },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }, { "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) pm.collectionVariables.set('apartment_id', json.data.id);"] } }]
+        },
+        { "name": "List Building Apartments", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}/apartments" } },
+        { "name": "Show Apartment", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/apartments/{{apartment_id}}" } },
+        { "name": "Update Apartment", "request": { "method": "PUT", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"floor\": 2,\n  \"area\": 90\n}" }, "url": "{{base_url}}/apartments/{{apartment_id}}" } },
+        { "name": "Delete Apartment (run last)", "request": { "method": "DELETE", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/apartments/{{apartment_id}}" } }
+      ]
+    },
+    {
+      "name": "04 - Charges",
+      "item": [
+        {
+          "name": "Create Charge",
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"apartment_id\": {{apartment_id}},\n  \"title\": \"شارژ ماهانه مهر\",\n  \"month\": \"2026-10\",\n  \"amount\": 2500000,\n  \"status\": \"pending\"\n}" }, "url": "{{base_url}}/buildings/{{building_id}}/charges" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }, { "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) pm.collectionVariables.set('charge_id', json.data.id);"] } }]
+        },
+        { "name": "List Building Charges", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}/charges" } },
+        { "name": "Show Charge", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/charges/{{charge_id}}" } },
+        { "name": "Mark Charge Paid", "request": { "method": "PUT", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"paid\",\n  \"paid_at\": \"2026-10-10 10:30:00\"\n}" }, "url": "{{base_url}}/charges/{{charge_id}}" } },
+        {
+          "name": "Resident - My Charges",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/charges" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('resident_token'));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "05 - Expenses",
+      "item": [
+        {
+          "name": "Create Expense with Optional Receipt",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "formdata", "formdata": [{ "key": "title", "value": "تعمیر آسانسور", "type": "text" }, { "key": "amount", "value": "5000000", "type": "text" }, { "key": "category", "value": "تعمیرات", "type": "text" }, { "key": "description", "value": "تعویض قطعه آسانسور", "type": "text" }, { "key": "image", "type": "file", "src": [], "disabled": true }] },
+            "url": "{{base_url}}/buildings/{{building_id}}/expenses"
+          },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        },
+        { "name": "List Building Expenses", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}/expenses" } }
+      ]
+    },
+    {
+      "name": "06 - Announcements",
+      "item": [
+        {
+          "name": "Create Announcement",
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"قطع موقت آب\",\n  \"body\": \"آب ساختمان فردا از ساعت ۱۰ تا ۱۲ قطع خواهد بود.\"\n}" }, "url": "{{base_url}}/buildings/{{building_id}}/announcements" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        },
+        {
+          "name": "Resident - List Announcements",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}/announcements" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('resident_token'));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "07 - Resident Requests",
+      "item": [
+        {
+          "name": "Resident - Create Request",
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"apartment_id\": {{apartment_id}},\n  \"title\": \"خرابی آیفون\",\n  \"description\": \"آیفون واحد از دیروز کار نمی‌کند.\"\n}" }, "url": "{{base_url}}/requests" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('resident_token'));"] } }, { "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success) pm.collectionVariables.set('request_id', json.data.id);"] } }]
+        },
+        { "name": "Resident - List My Requests", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/requests" } },
+        {
+          "name": "Manager - List Requests",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/requests" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        },
+        {
+          "name": "Manager - Respond to Request",
+          "request": { "method": "PUT", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"completed\",\n  \"response\": \"تعمیرکار مراجعه کرد و مشکل برطرف شد.\"\n}" }, "url": "{{base_url}}/requests/{{request_id}}" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "08 - Notifications",
+      "item": [
+        {
+          "name": "Resident - List Notifications",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/notifications" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('resident_token'));"] } }, { "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.success && json.data.length) pm.collectionVariables.set('notification_id', json.data[0].id);"] } }]
+        },
+        {
+          "name": "Resident - Mark Notification Read",
+          "request": { "method": "PUT", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/notifications/{{notification_id}}/read" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('resident_token'));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "09 - Reports",
+      "item": [
+        {
+          "name": "Building Summary Report",
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/buildings/{{building_id}}/reports/summary" },
+          "event": [{ "listen": "prerequest", "script": { "exec": ["pm.collectionVariables.set('token', pm.collectionVariables.get('manager_token'));"] } }]
+        }
+      ]
+    }
+  ]
+}
