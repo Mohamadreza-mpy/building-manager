@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Services;
+
+use App\Contracts\TokenStorage;
+use App\Exceptions\ApiException;
+use App\Exceptions\UnauthorizedApiException;
+use App\Http\ApiResponse;
+use App\State\AuthState;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http;
+
+class ApiClient
+{
+    public function __construct(
+        private readonly TokenStorage $tokenStorage,
+        private readonly AuthState $authState,
+    ) {}
+
+    public function get(string $uri, array $query = []): ApiResponse
+    {
+        return $this->request('GET', $uri, ['query' => $query]);
+    }
+
+    public function post(string $uri, array $data = []): ApiResponse
+    {
+        return $this->request('POST', $uri, ['json' => $data]);
+    }
+
+    private function request(string $method, string $uri, array $options): ApiResponse
+    {
+        try {
+            $response = $this->client()->send($method, ltrim($uri, '/'), $options);
+        } catch (ConnectionException) {
+            throw new ApiException('ارتباط با سرور برقرار نشد. اتصال اینترنت و آدرس سرور را بررسی کنید.');
+        }
+
+        $payload = $response->json();
+        $payload = is_array($payload) ? $payload : [];
+
+        if ($response->status() === 401) {
+            $this->tokenStorage->forget();
+            $this->authState->clear();
+
+            throw new UnauthorizedApiException(
+                message: 'نشست شما منقضی شده است. دوباره وارد شوید.',
+                status: 401,
+            );
+        }
+
+        if ($response->failed() || ! ($payload['success'] ?? false)) {
+            throw new ApiException(
+                message: (string) ($payload['message'] ?? 'خطایی در پردازش درخواست رخ داد.'),
+                errors: is_array($payload['errors'] ?? null) ? $payload['errors'] : [],
+                status: $response->status(),
+            );
+        }
+
+        return new ApiResponse(
+            success: true,
+            message: (string) ($payload['message'] ?? ''),
+            data: $payload['data'] ?? null,
+            status: $response->status(),
+        );
+    }
+
+    private function client(): PendingRequest
+    {
+        $request = Http::baseUrl((string) config('api.base_url'))
+            ->acceptJson()
+            ->asJson()
+            ->timeout((int) config('api.timeout'));
+
+        $token = $this->tokenStorage->get();
+
+        return $token ? $request->withToken($token) : $request;
+    }
+}
