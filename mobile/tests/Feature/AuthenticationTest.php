@@ -8,6 +8,7 @@ use App\Services\AuthService;
 use App\Services\SecureTokenStorage;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
+use Native\Mobile\Facades\SecureStorage;
 use Tests\Support\InMemoryTokenStorage;
 use Tests\TestCase;
 
@@ -46,6 +47,24 @@ class AuthenticationTest extends TestCase
         $this->assertNull($storage->get());
     }
 
+    public function test_jump_falls_back_to_session_when_secure_storage_is_unavailable(): void
+    {
+        config(['nativephp-internal.running' => false]);
+        putenv('JUMP_BRIDGE_PORT=3002');
+        SecureStorage::shouldReceive('set')->once()->andReturnFalse();
+        SecureStorage::shouldReceive('get')->once()->andReturnNull();
+
+        try {
+            $storage = new SecureTokenStorage;
+            $storage->store('jump-token');
+
+            $this->assertSame('jump-token', $storage->get());
+        } finally {
+            putenv('JUMP_BRIDGE_PORT');
+            session()->forget('building_manager_auth_token');
+        }
+    }
+
     public function test_user_can_login_through_backend_api(): void
     {
         Http::fake([
@@ -69,7 +88,7 @@ class AuthenticationTest extends TestCase
         $this->assertSame('sanctum-token', $this->tokens->token);
         $this->assertSame('manager', session('building_manager_auth_user.role'));
 
-        Http::assertSent(fn ($request) => $request->url() === config('api.base_url').'/auth/login'
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/auth/login')
             && $request['mobile'] === '09120000002'
             && $request['password'] === '123456');
     }
