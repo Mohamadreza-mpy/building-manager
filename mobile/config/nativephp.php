@@ -110,6 +110,7 @@ return [
     */
 
     'permissions' => [
+        'push_notifications' => (bool) env('PUSH_NOTIFICATIONS_ENABLED', false),
         'NSCameraUsageDescription' => 'برای ثبت تصویر رسید هزینه به دوربین نیاز داریم.',
         // 'NSMicrophoneUsageDescription' => 'Used to record audio with your videos.',
         'NSPhotoLibraryUsageDescription' => 'برای انتخاب تصویر رسید هزینه به گالری نیاز داریم.',

@@ -44,4 +44,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Apartment::class, 'resident_id');
     }
+
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
 }

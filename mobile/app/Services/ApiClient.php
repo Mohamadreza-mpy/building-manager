@@ -34,9 +34,9 @@ class ApiClient
         return $this->request('PUT', $uri, ['json' => $data]);
     }
 
-    public function delete(string $uri): ApiResponse
+    public function delete(string $uri, array $data = []): ApiResponse
     {
-        return $this->request('DELETE', $uri, []);
+        return $this->request('DELETE', $uri, ['json' => $data]);
     }
 
     public function postMultipart(string $uri, array $data, ?string $filePath = null, ?string $mimeType = null, ?string $fileName = null): ApiResponse

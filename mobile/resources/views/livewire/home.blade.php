@@ -20,6 +20,11 @@
     @endif
 
     @if ($isResident)
+        <a href="{{ route('notifications.index') }}" wire:navigate class="module-link">
+            <div class="card-icon violet">●</div>
+            <div><strong>اعلان‌ها</strong><span>رویدادها و پیام‌های جدید</span></div>
+            <b>‹</b>
+        </a>
         <a href="{{ route('requests.index') }}" wire:navigate class="module-link">
             <div class="card-icon rose">✓</div>
             <div><strong>درخواست‌های من</strong><span>ثبت درخواست و مشاهده پاسخ مدیر</span></div>
@@ -73,6 +78,11 @@
             </div>
         </section>
     @else
+        <a href="{{ route('notifications.index') }}" wire:navigate class="module-link">
+            <div class="card-icon violet">●</div>
+            <div><strong>اعلان‌ها</strong><span>رویدادها و پیام‌های جدید</span></div>
+            <b>‹</b>
+        </a>
         <a href="{{ route('requests.index') }}" wire:navigate class="module-link">
             <div class="card-icon rose">!</div>
             <div><strong>درخواست‌های ساکنان</strong><span>بررسی و پاسخ‌گویی به درخواست‌ها</span></div>

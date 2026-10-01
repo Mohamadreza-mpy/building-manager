@@ -15,6 +15,7 @@ use App\Livewire\Charges\Show as ChargeShow;
 use App\Livewire\Expenses\Form as ExpenseForm;
 use App\Livewire\Expenses\Index as ExpenseIndex;
 use App\Livewire\Home;
+use App\Livewire\Notifications\Index as NotificationIndex;
 use App\Livewire\Requests\Form as RequestForm;
 use App\Livewire\Requests\Index as RequestIndex;
 use App\Livewire\Requests\Respond as RequestRespond;
@@ -33,6 +34,7 @@ Route::middleware('mobile.auth')->group(function () {
     Route::get('/buildings/{building}/expenses', ExpenseIndex::class)->whereNumber('building')->name('expenses.index');
     Route::get('/buildings/{building}/announcements', AnnouncementIndex::class)->whereNumber('building')->name('announcements.index');
     Route::get('/requests', RequestIndex::class)->name('requests.index');
+    Route::get('/notifications', NotificationIndex::class)->name('notifications.index');
 
     Route::middleware('mobile.resident')->group(function () {
         Route::get('/charges', ChargeIndex::class)->name('charges.mine');
