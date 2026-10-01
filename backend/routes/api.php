@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/buildings/{building}/charges', [ChargeController::class, 'store']);
     Route::get('/charges/{charge}', [ChargeController::class, 'show']);
     Route::put('/charges/{charge}', [ChargeController::class, 'update']);
+    Route::post('/charges/{charge}/receipt', [ChargeController::class, 'submitReceipt']);
     Route::get('/buildings/{building}/expenses', [ExpenseController::class, 'index']);
     Route::post('/buildings/{building}/expenses', [ExpenseController::class, 'store']);
     Route::get('/buildings/{building}/announcements', [AnnouncementController::class, 'index']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreChargeRequest;
+use App\Http\Requests\SubmitChargeReceiptRequest;
 use App\Http\Requests\UpdateChargeRequest;
 use App\Http\Resources\ChargeResource;
 use App\Models\Building;
@@ -26,9 +27,13 @@ class ChargeController extends Controller
 
     public function myCharges(Request $request): AnonymousResourceCollection
     {
-        abort_unless($request->user()->role === 'resident', 403);
+        abort_unless(in_array($request->user()->role, ['resident', 'owner'], true), 403);
 
-        return ChargeResource::collection($this->service->listForResident($request->user()))->additional(['success' => true, 'message' => 'فهرست شارژهای شما دریافت شد.']);
+        $charges = $request->user()->role === 'owner'
+            ? $this->service->listForOwner($request->user())
+            : $this->service->listForResident($request->user());
+
+        return ChargeResource::collection($charges)->additional(['success' => true, 'message' => 'فهرست شارژهای شما دریافت شد.']);
     }
 
     public function store(StoreChargeRequest $request, Building $building): JsonResponse
@@ -46,5 +51,10 @@ class ChargeController extends Controller
     public function update(UpdateChargeRequest $request, Charge $charge): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'شارژ با موفقیت ویرایش شد.', 'data' => new ChargeResource($this->service->update($charge, $request->validated()))]);
+    }
+
+    public function submitReceipt(SubmitChargeReceiptRequest $request, Charge $charge): JsonResponse
+    {
+        return response()->json(['success' => true, 'message' => 'رسید پرداخت برای بررسی مدیر ثبت شد.', 'data' => new ChargeResource($this->service->submitReceipt($charge, $request->file('image')))]);
     }
 }

@@ -19,6 +19,8 @@ class Index extends Component
 
     public bool $isResident = false;
 
+    public bool $isOwner = false;
+
     public array $charges = [];
 
     public ?string $errorMessage = null;
@@ -26,7 +28,9 @@ class Index extends Component
     public function mount(ChargeService $charges, AuthService $auth, BuildingService $buildings, ?int $building = null): void
     {
         $this->buildingId = $building;
-        $this->isResident = $auth->currentUser()?->role === 'resident';
+        $role = $auth->currentUser()?->role;
+        $this->isResident = $role === 'resident';
+        $this->isOwner = $role === 'owner';
         $this->loadCharges($charges, $buildings);
     }
 
@@ -50,7 +54,7 @@ class Index extends Component
         $this->errorMessage = null;
 
         try {
-            if ($this->isResident) {
+            if ($this->isResident || $this->isOwner) {
                 $items = $charges->mine();
             } else {
                 abort_unless($this->buildingId, 404);

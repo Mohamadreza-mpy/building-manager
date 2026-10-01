@@ -31,6 +31,11 @@ class ChargeService
         return $this->chargeFrom($this->api->post("/buildings/{$buildingId}/charges", $data)->data);
     }
 
+    public function submitReceipt(int $id, string $filePath, ?string $mimeType = null, ?string $fileName = null): Charge
+    {
+        return $this->chargeFrom($this->api->postMultipart("/charges/{$id}/receipt", [], $filePath, $mimeType, $fileName)->data);
+    }
+
     private function chargeList(mixed $data): array
     {
         if (! is_array($data)) {

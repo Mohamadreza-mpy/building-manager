@@ -7,6 +7,7 @@ use App\Livewire\Charges\Form;
 use App\Livewire\Charges\Index;
 use App\Livewire\Charges\Show;
 use Illuminate\Http\Client\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\Support\InMemoryTokenStorage;
@@ -102,13 +103,80 @@ class ChargeModuleTest extends TestCase
             ->assertSee('پرداخت نشده');
     }
 
+    public function test_owner_can_see_charges_and_submit_payment_receipt(): void
+    {
+        Http::fake(function (Request $request) {
+            if (str_ends_with($request->url(), '/auth/me')) {
+                return Http::response($this->success($this->user('owner')));
+            }
+
+            $charge = $this->charge(16, 'pending');
+            if ($request->method() === 'POST') {
+                $charge['payment_receipt_url'] = 'http://api.test/storage/charge-receipts/receipt.jpg';
+                $charge['receipt_submitted_at'] = '2026-10-01T10:00:00Z';
+            }
+
+            return Http::response($this->success($request->method() === 'GET' && str_ends_with($request->url(), '/charges') ? [$charge] : $charge));
+        });
+
+        Livewire::test(Index::class)->assertSee('شارژهای من')->assertDontSee('ثبت شارژ جدید');
+
+        Livewire::test(Show::class, ['charge' => 16])
+            ->assertSee('پرداخت شارژ')
+            ->set('receipt', UploadedFile::fake()->image('receipt.jpg')->size(800))
+            ->call('submitReceipt')
+            ->assertHasNoErrors()
+            ->assertSee('در انتظار بررسی مدیر');
+
+        Http::assertSent(fn (Request $request) => $request->method() === 'POST' && str_ends_with($request->url(), '/charges/16/receipt'));
+    }
+
+    public function test_owner_receipt_validation_rejects_large_or_unsupported_file(): void
+    {
+        Http::fake(function (Request $request) {
+            if (str_ends_with($request->url(), '/auth/me')) {
+                return Http::response($this->success($this->user('owner')));
+            }
+
+            return Http::response($this->success($this->charge(17, 'pending')));
+        });
+
+        Livewire::test(Show::class, ['charge' => 17])
+            ->set('receipt', UploadedFile::fake()->create('receipt.pdf', 100, 'application/pdf'))
+            ->call('submitReceipt')->assertHasErrors('receipt');
+
+        Livewire::test(Show::class, ['charge' => 17])
+            ->set('receipt', UploadedFile::fake()->image('receipt.png')->size(1025))
+            ->call('submitReceipt')->assertHasErrors('receipt');
+    }
+
+    public function test_manager_can_see_submitted_receipt(): void
+    {
+        Http::fake(function (Request $request) {
+            if (str_ends_with($request->url(), '/auth/me')) {
+                return Http::response($this->success($this->user('manager')));
+            }
+
+            $charge = $this->charge(18, 'pending');
+            $charge['payment_receipt_url'] = 'http://api.test/storage/charge-receipts/receipt.jpg';
+            $charge['receipt_submitted_at'] = '2026-10-01T10:00:00Z';
+
+            return Http::response($this->success($charge));
+        });
+
+        Livewire::test(Show::class, ['charge' => 18])
+            ->assertSee('رسید پرداخت')
+            ->assertSee('در انتظار بررسی مدیر')
+            ->assertSeeHtml('storage/charge-receipts/receipt.jpg');
+    }
+
     public function test_manager_cannot_open_resident_charge_list_route(): void
     {
         Http::fake(['*/auth/me' => Http::response($this->success($this->user('manager')))]);
 
         $this->get(route('charges.mine'))
             ->assertRedirect(route('home'))
-            ->assertSessionHas('error_message', 'این بخش مخصوص ساکنان است.');
+            ->assertSessionHas('error_message', 'این بخش مخصوص ساکنان و مالکین است.');
     }
 
     private function success(mixed $data): array
@@ -133,6 +201,6 @@ class ChargeModuleTest extends TestCase
 
     private function charge(int $id, string $status): array
     {
-        return ['id' => $id, 'building_id' => 2, 'apartment_id' => 5, 'title' => 'شارژ ماهانه', 'month' => '2026-10', 'amount' => '5000000.00', 'status' => $status, 'paid_at' => $status === 'paid' ? '2026-10-05T10:30:00Z' : null, 'apartment' => $this->apartment()];
+        return ['id' => $id, 'building_id' => 2, 'apartment_id' => 5, 'title' => 'شارژ ماهانه', 'month' => '2026-10', 'amount' => '5000000.00', 'status' => $status, 'paid_at' => $status === 'paid' ? '2026-10-05T10:30:00Z' : null, 'payment_receipt_url' => null, 'receipt_submitted_at' => null, 'apartment' => $this->apartment()];
     }
 }

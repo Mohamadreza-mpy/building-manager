@@ -7,17 +7,24 @@ use App\Models\Charge;
 use App\Models\User;
 use App\Notifications\InAppNotification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ChargeService
 {
     public function list(Building $building): LengthAwarePaginator
     {
-        return $building->charges()->with('apartment.resident')->latest('month')->paginate(20);
+        return $building->charges()->with(['apartment.resident', 'apartment.owner'])->latest('month')->paginate(20);
     }
 
     public function listForResident(User $user): LengthAwarePaginator
     {
         return Charge::query()->with('apartment')->whereHas('apartment', fn ($query) => $query->where('resident_id', $user->id))->latest('month')->paginate(20);
+    }
+
+    public function listForOwner(User $user): LengthAwarePaginator
+    {
+        return Charge::query()->with('apartment')->whereHas('apartment', fn ($query) => $query->where('owner_id', $user->id))->latest('month')->paginate(20);
     }
 
     public function create(Building $building, array $data): Charge
@@ -32,7 +39,7 @@ class ChargeService
 
     public function find(Charge $charge): Charge
     {
-        return $charge->load('apartment.resident');
+        return $charge->load(['apartment.resident', 'apartment.owner']);
     }
 
     public function update(Charge $charge, array $data): Charge
@@ -40,5 +47,19 @@ class ChargeService
         $charge->update($data);
 
         return $charge->refresh()->load('apartment.resident');
+    }
+
+    public function submitReceipt(Charge $charge, UploadedFile $image): Charge
+    {
+        if ($charge->payment_receipt) {
+            Storage::disk('public')->delete($charge->payment_receipt);
+        }
+
+        $charge->update([
+            'payment_receipt' => $image->store('charge-receipts', 'public'),
+            'receipt_submitted_at' => now(),
+        ]);
+
+        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
     }
 }

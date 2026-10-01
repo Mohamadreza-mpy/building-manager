@@ -13,6 +13,8 @@ final readonly class Charge
         public string $amount,
         public string $status,
         public ?string $paidAt,
+        public ?string $paymentReceiptUrl,
+        public ?string $receiptSubmittedAt,
         public ?array $apartment,
     ) {}
 
@@ -27,6 +29,8 @@ final readonly class Charge
             amount: (string) $data['amount'],
             status: (string) $data['status'],
             paidAt: isset($data['paid_at']) ? (string) $data['paid_at'] : null,
+            paymentReceiptUrl: isset($data['payment_receipt_url']) ? (string) $data['payment_receipt_url'] : null,
+            receiptSubmittedAt: isset($data['receipt_submitted_at']) ? (string) $data['receipt_submitted_at'] : null,
             apartment: is_array($data['apartment'] ?? null) ? $data['apartment'] : null,
         );
     }
@@ -43,6 +47,8 @@ final readonly class Charge
             'status' => $this->status,
             'status_label' => $this->statusLabel(),
             'paid_at' => $this->paidAt,
+            'payment_receipt_url' => $this->paymentReceiptUrl,
+            'receipt_submitted_at' => $this->receiptSubmittedAt,
             'apartment' => $this->apartment,
         ];
     }

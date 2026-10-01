@@ -35,13 +35,13 @@ Route::get('/login', Login::class)->name('login');
 Route::middleware('mobile.auth')->group(function () {
     Route::get('/home', Home::class)->name('home');
     Route::get('/charges/{charge}', ChargeShow::class)->whereNumber('charge')->name('charges.show');
+    Route::middleware('mobile.personal-charge')->get('/charges', ChargeIndex::class)->name('charges.mine');
     Route::get('/buildings/{building}/expenses', ExpenseIndex::class)->whereNumber('building')->name('expenses.index');
     Route::get('/buildings/{building}/announcements', AnnouncementIndex::class)->whereNumber('building')->name('announcements.index');
     Route::get('/requests', RequestIndex::class)->name('requests.index');
     Route::get('/notifications', NotificationIndex::class)->name('notifications.index');
 
     Route::middleware('mobile.resident')->group(function () {
-        Route::get('/charges', ChargeIndex::class)->name('charges.mine');
         Route::get('/requests/create', RequestForm::class)->name('requests.create');
     });
 

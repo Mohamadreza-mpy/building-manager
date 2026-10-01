@@ -1,7 +1,7 @@
 <main class="module-shell">
     <header class="module-header">
-        <a href="{{ $isResident ? route('home') : route('buildings.show', $buildingId) }}" wire:navigate class="back-button" aria-label="بازگشت">→</a>
-        <div><p class="eyebrow">{{ $isResident ? 'حساب من' : ($buildingName ?: 'ساختمان') }}</p><h1>{{ $isResident ? 'شارژهای من' : 'شارژها' }}</h1></div>
+        <a href="{{ ($isResident || $isOwner) ? route('home') : route('buildings.show', $buildingId) }}" wire:navigate class="back-button" aria-label="بازگشت">→</a>
+        <div><p class="eyebrow">{{ ($isResident || $isOwner) ? 'حساب من' : ($buildingName ?: 'ساختمان') }}</p><h1>{{ ($isResident || $isOwner) ? 'شارژهای من' : 'شارژها' }}</h1></div>
         <button type="button" class="icon-button" wire:click="refreshCharges" wire:loading.attr="disabled" aria-label="بروزرسانی">↻</button>
     </header>
 
@@ -10,7 +10,7 @@
         <div class="alert alert-error dashboard-alert"><span>{{ $errorMessage }}</span><button wire:click="refreshCharges">تلاش دوباره</button></div>
     @endif
 
-    @unless($isResident)
+    @unless($isResident || $isOwner)
         <a href="{{ route('charges.create', $buildingId) }}" wire:navigate class="primary-button add-button">+ ثبت شارژ جدید</a>
     @endunless
 
@@ -24,7 +24,7 @@
                 <div class="charge-amount"><strong>{{ $this->formatAmount($charge['amount']) }}</strong><span>ریال</span><b>‹</b></div>
             </a>
         @empty
-            @unless($errorMessage)<div class="empty-state large"><strong>شارژی برای نمایش وجود ندارد.</strong><span>{{ $isResident ? 'هنوز شارژی برای واحد شما ثبت نشده است.' : 'اولین شارژ ساختمان را ثبت کنید.' }}</span></div>@endunless
+            @unless($errorMessage)<div class="empty-state large"><strong>شارژی برای نمایش وجود ندارد.</strong><span>{{ ($isResident || $isOwner) ? 'هنوز شارژی برای واحد شما ثبت نشده است.' : 'اولین شارژ ساختمان را ثبت کنید.' }}</span></div>@endunless
         @endforelse
     </section>
 </main>
