@@ -35,6 +35,18 @@
             </div>
             @error('ownerId') <p class="field-error">{{ $message }}</p> @enderror
         </div>
+        <div class="field-group">
+            <div class="section-heading"><label for="residentId">ساکن واحد</label><a href="{{ route('residents.create') }}" wire:navigate>+ ساکن جدید</a></div>
+            <div class="input-wrap @error('residentId') has-error @enderror">
+                <select id="residentId" wire:model="residentId">
+                    <option value="">بدون ساکن</option>
+                    @foreach($residents as $resident)
+                        <option value="{{ $resident['id'] }}">{{ $resident['name'] }} — {{ $resident['mobile'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @error('residentId') <p class="field-error">{{ $message }}</p> @enderror
+        </div>
         <button class="primary-button" type="submit" wire:loading.attr="disabled" wire:target="save">
             <span wire:loading.remove wire:target="save">{{ $apartmentId ? 'ذخیره تغییرات' : 'ایجاد واحد' }}</span>
             <span wire:loading.flex wire:target="save" class="loading-label"><i class="spinner"></i>در حال ذخیره…</span>

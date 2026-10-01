@@ -117,6 +117,11 @@
             <div><strong>مدیریت مالکین</strong><span>ثبت مالک و مشاهده واحدهای تحت مالکیت</span></div>
             <b>‹</b>
         </a>
+        <a href="{{ route('residents.index') }}" wire:navigate class="module-link">
+            <div class="card-icon violet">●</div>
+            <div><strong>مدیریت ساکنین</strong><span>ثبت ساکن و تخصیص مستقل به واحد</span></div>
+            <b>‹</b>
+        </a>
 
         <section class="stats-grid manager-grid" aria-label="خلاصه وضعیت مدیریت">
             <article class="stat-card"><div class="card-icon blue">⌂</div><span>ساختمان‌ها</span><strong>{{ $this->number($dashboard['buildings_count'] ?? 0) }}</strong><small>ساختمان تحت مدیریت</small></article>

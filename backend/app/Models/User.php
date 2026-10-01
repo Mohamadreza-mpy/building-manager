@@ -56,6 +56,11 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'created_by');
     }
 
+    public function createdResidents(): HasMany
+    {
+        return $this->hasMany(User::class, 'created_by')->where('role', 'resident');
+    }
+
     public function deviceTokens(): HasMany
     {
         return $this->hasMany(DeviceToken::class);

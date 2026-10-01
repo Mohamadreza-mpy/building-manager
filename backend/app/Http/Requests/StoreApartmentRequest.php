@@ -17,14 +17,16 @@ class StoreApartmentRequest extends FormRequest
     {
         $buildingId = $this->route('building')?->id;
         $ownerRule = Rule::exists('users', 'id')->where('role', 'owner');
+        $residentRule = Rule::exists('users', 'id')->where('role', 'resident');
 
         if ($this->user()?->role === 'manager') {
             $ownerRule->where('created_by', $this->user()->id);
+            $residentRule->where('created_by', $this->user()->id);
         }
 
         return [
             'owner_id' => ['nullable', $ownerRule],
-            'resident_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'resident')],
+            'resident_id' => ['nullable', $residentRule],
             'number' => ['required', 'string', 'max:20', Rule::unique('apartments')->where('building_id', $buildingId)],
             'floor' => ['nullable', 'integer'],
             'area' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],

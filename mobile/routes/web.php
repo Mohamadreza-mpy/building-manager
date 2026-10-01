@@ -21,6 +21,8 @@ use App\Livewire\Owners\Index as OwnerIndex;
 use App\Livewire\Requests\Form as RequestForm;
 use App\Livewire\Requests\Index as RequestIndex;
 use App\Livewire\Requests\Respond as RequestRespond;
+use App\Livewire\Residents\Form as ResidentForm;
+use App\Livewire\Residents\Index as ResidentIndex;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,8 @@ Route::middleware('mobile.auth')->group(function () {
     Route::middleware('mobile.management')->group(function () {
         Route::get('/owners', OwnerIndex::class)->name('owners.index');
         Route::get('/owners/create', OwnerForm::class)->name('owners.create');
+        Route::get('/residents', ResidentIndex::class)->name('residents.index');
+        Route::get('/residents/create', ResidentForm::class)->name('residents.create');
         Route::get('/buildings', BuildingIndex::class)->name('buildings.index');
         Route::get('/buildings/create', BuildingForm::class)->name('buildings.create');
         Route::get('/buildings/{building}/edit', BuildingForm::class)->whereNumber('building')->name('buildings.edit');

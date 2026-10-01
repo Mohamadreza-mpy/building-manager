@@ -16,14 +16,16 @@ class UpdateApartmentRequest extends FormRequest
     {
         $apartment = $this->route('apartment');
         $ownerRule = Rule::exists('users', 'id')->where('role', 'owner');
+        $residentRule = Rule::exists('users', 'id')->where('role', 'resident');
 
         if ($this->user()?->role === 'manager') {
             $ownerRule->where('created_by', $this->user()->id);
+            $residentRule->where('created_by', $this->user()->id);
         }
 
         return [
             'owner_id' => ['sometimes', 'nullable', $ownerRule],
-            'resident_id' => ['sometimes', 'nullable', Rule::exists('users', 'id')->where('role', 'resident')],
+            'resident_id' => ['sometimes', 'nullable', $residentRule],
             'number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('apartments')->where('building_id', $apartment?->building_id)->ignore($apartment)],
             'floor' => ['sometimes', 'nullable', 'integer'],
             'area' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:999999.99'],

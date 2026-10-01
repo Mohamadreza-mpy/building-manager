@@ -47,6 +47,7 @@ class ApartmentModuleTest extends TestCase
     {
         Http::fake([
             '*/owners' => Http::response($this->success([])),
+            '*/residents' => Http::response($this->success([['id' => 6, 'name' => 'ساکن نمونه', 'mobile' => '09123333333', 'email' => null, 'apartments_count' => 0]])),
             '*/buildings/2/apartments' => Http::response($this->success($this->apartment(12, '۲۰۱')), 201),
         ]);
 
@@ -54,6 +55,7 @@ class ApartmentModuleTest extends TestCase
             ->set('number', '۲۰۱')
             ->set('floor', '2')
             ->set('area', '85.5')
+            ->set('residentId', '6')
             ->call('save')
             ->assertHasNoErrors()
             ->assertRedirect(route('apartments.show', 12));
@@ -62,13 +64,14 @@ class ApartmentModuleTest extends TestCase
             && str_ends_with($request->url(), '/buildings/2/apartments')
             && $request['number'] === '۲۰۱'
             && $request['floor'] === 2
-            && $request['area'] === 85.5);
+            && $request['area'] === 85.5
+            && $request['resident_id'] === 6);
     }
 
     public function test_manager_can_edit_an_apartment(): void
     {
         Http::fake(function (Request $request) {
-            if (str_ends_with($request->url(), '/owners')) {
+            if (str_ends_with($request->url(), '/owners') || str_ends_with($request->url(), '/residents')) {
                 return Http::response($this->success([]));
             }
 
@@ -115,8 +118,9 @@ class ApartmentModuleTest extends TestCase
             ->call('save')
             ->assertHasErrors(['number' => 'required']);
 
-        Http::assertSentCount(1);
+        Http::assertSentCount(2);
         Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/owners'));
+        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/residents'));
     }
 
     private function success(mixed $data): array

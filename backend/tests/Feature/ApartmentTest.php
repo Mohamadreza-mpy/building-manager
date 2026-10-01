@@ -15,7 +15,7 @@ class ApartmentTest extends TestCase
     public function test_manager_can_create_apartment_and_assign_resident(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
-        $resident = User::factory()->create(['role' => 'resident']);
+        $resident = User::factory()->create(['role' => 'resident', 'created_by' => $manager->id]);
         $building = Building::create(['manager_id' => $manager->id, 'name' => 'برج']);
         Sanctum::actingAs($manager);
         $this->postJson("/api/buildings/{$building->id}/apartments", ['number' => '۱', 'floor' => 1, 'resident_id' => $resident->id])->assertCreated()->assertJsonPath('data.resident.id', $resident->id);
