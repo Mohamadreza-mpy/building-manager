@@ -16,7 +16,7 @@ class ResidentRequestService
 
     public function create(array $data): ResidentRequest
     {
-        return ResidentRequest::create($data)->load('apartment.building');
+        return ResidentRequest::create($data)->refresh()->load('apartment.building');
     }
 
     public function respond(ResidentRequest $item, array $data): ResidentRequest

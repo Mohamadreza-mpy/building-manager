@@ -20,6 +20,11 @@
     @endif
 
     @if ($isResident)
+        <a href="{{ route('requests.index') }}" wire:navigate class="module-link">
+            <div class="card-icon rose">✓</div>
+            <div><strong>درخواست‌های من</strong><span>ثبت درخواست و مشاهده پاسخ مدیر</span></div>
+            <b>‹</b>
+        </a>
         <a href="{{ route('charges.mine') }}" wire:navigate class="module-link">
             <div class="card-icon amber">﷼</div>
             <div><strong>شارژهای من</strong><span>مشاهده مبالغ و وضعیت پرداخت</span></div>
@@ -68,6 +73,11 @@
             </div>
         </section>
     @else
+        <a href="{{ route('requests.index') }}" wire:navigate class="module-link">
+            <div class="card-icon rose">!</div>
+            <div><strong>درخواست‌های ساکنان</strong><span>بررسی و پاسخ‌گویی به درخواست‌ها</span></div>
+            <b>‹</b>
+        </a>
         <a href="{{ route('buildings.index') }}" wire:navigate class="module-link">
             <div class="card-icon blue">⌂</div>
             <div><strong>مدیریت ساختمان‌ها</strong><span>مشاهده، افزودن و ویرایش ساختمان‌ها</span></div>
