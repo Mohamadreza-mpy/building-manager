@@ -26,6 +26,11 @@
             <b>‹</b>
         </a>
         @if($dashboard['current_apartment']['building']['id'] ?? null)
+            <a href="{{ route('announcements.index', $dashboard['current_apartment']['building']['id']) }}" wire:navigate class="module-link">
+                <div class="card-icon violet">●</div>
+                <div><strong>اطلاعیه‌های ساختمان</strong><span>مشاهده پیام‌های مدیر ساختمان</span></div>
+                <b>‹</b>
+            </a>
             <a href="{{ route('expenses.index', $dashboard['current_apartment']['building']['id']) }}" wire:navigate class="module-link">
                 <div class="card-icon rose">−</div>
                 <div><strong>هزینه‌های ساختمان</strong><span>مشاهده هزینه‌ها و رسیدها</span></div>

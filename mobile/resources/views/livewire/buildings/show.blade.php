@@ -34,6 +34,11 @@
             <div><strong>مدیریت هزینه‌ها</strong><span>ثبت هزینه و مشاهده رسیدها</span></div>
             <b>‹</b>
         </a>
+        <a href="{{ route('announcements.index', $buildingId) }}" wire:navigate class="module-link detail-module-link charge-module-link">
+            <div class="card-icon violet">●</div>
+            <div><strong>مدیریت اطلاعیه‌ها</strong><span>انتشار و مشاهده اطلاعیه‌های ساختمان</span></div>
+            <b>‹</b>
+        </a>
 
         <section class="danger-zone">
             @if ($confirmingDelete)

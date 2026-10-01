@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Announcements\Form as AnnouncementForm;
+use App\Livewire\Announcements\Index as AnnouncementIndex;
 use App\Livewire\Apartments\Form as ApartmentForm;
 use App\Livewire\Apartments\Index as ApartmentIndex;
 use App\Livewire\Apartments\Show as ApartmentShow;
@@ -26,6 +28,7 @@ Route::middleware('mobile.auth')->group(function () {
     Route::get('/home', Home::class)->name('home');
     Route::get('/charges/{charge}', ChargeShow::class)->whereNumber('charge')->name('charges.show');
     Route::get('/buildings/{building}/expenses', ExpenseIndex::class)->whereNumber('building')->name('expenses.index');
+    Route::get('/buildings/{building}/announcements', AnnouncementIndex::class)->whereNumber('building')->name('announcements.index');
 
     Route::middleware('mobile.resident')->group(function () {
         Route::get('/charges', ChargeIndex::class)->name('charges.mine');
@@ -43,5 +46,6 @@ Route::middleware('mobile.auth')->group(function () {
         Route::get('/buildings/{building}/charges', ChargeIndex::class)->whereNumber('building')->name('charges.index');
         Route::get('/buildings/{building}/charges/create', ChargeForm::class)->whereNumber('building')->name('charges.create');
         Route::get('/buildings/{building}/expenses/create', ExpenseForm::class)->whereNumber('building')->name('expenses.create');
+        Route::get('/buildings/{building}/announcements/create', AnnouncementForm::class)->whereNumber('building')->name('announcements.create');
     });
 });
