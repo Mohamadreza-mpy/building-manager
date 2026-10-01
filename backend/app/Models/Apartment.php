@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'building_id',
+    'owner_id',
     'resident_id',
     'number',
     'floor',
@@ -34,6 +35,11 @@ class Apartment extends Model
     public function resident(): BelongsTo
     {
         return $this->belongsTo(User::class, 'resident_id');
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
     public function charges(): HasMany

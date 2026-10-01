@@ -16,6 +16,8 @@ use App\Livewire\Expenses\Form as ExpenseForm;
 use App\Livewire\Expenses\Index as ExpenseIndex;
 use App\Livewire\Home;
 use App\Livewire\Notifications\Index as NotificationIndex;
+use App\Livewire\Owners\Form as OwnerForm;
+use App\Livewire\Owners\Index as OwnerIndex;
 use App\Livewire\Requests\Form as RequestForm;
 use App\Livewire\Requests\Index as RequestIndex;
 use App\Livewire\Requests\Respond as RequestRespond;
@@ -42,6 +44,8 @@ Route::middleware('mobile.auth')->group(function () {
     });
 
     Route::middleware('mobile.management')->group(function () {
+        Route::get('/owners', OwnerIndex::class)->name('owners.index');
+        Route::get('/owners/create', OwnerForm::class)->name('owners.create');
         Route::get('/buildings', BuildingIndex::class)->name('buildings.index');
         Route::get('/buildings/create', BuildingForm::class)->name('buildings.create');
         Route::get('/buildings/{building}/edit', BuildingForm::class)->whereNumber('building')->name('buildings.edit');

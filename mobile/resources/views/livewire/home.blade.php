@@ -77,6 +77,25 @@
                 @endforelse
             </div>
         </section>
+    @elseif ($isOwner)
+        <a href="{{ route('notifications.index') }}" wire:navigate class="module-link">
+            <div class="card-icon violet">●</div>
+            <div><strong>اعلان‌ها</strong><span>رویدادها و پیام‌های جدید</span></div>
+            <b>‹</b>
+        </a>
+        <section class="stats-grid" aria-label="خلاصه وضعیت مالک">
+            <article class="stat-card wide"><div class="card-icon blue">⌂</div><span>واحدهای تحت مالکیت</span><strong>{{ $this->number($dashboard['owned_apartments_count'] ?? 0) }}</strong><small>واحد ثبت‌شده</small></article>
+        </section>
+        <section class="dashboard-section">
+            <div class="section-heading"><h2>واحدهای من</h2></div>
+            <div class="announcement-list">
+                @forelse($dashboard['owned_apartments'] ?? [] as $apartment)
+                    <article><i></i><div><strong>{{ $apartment['building']['name'] ?? 'ساختمان' }} · واحد {{ $apartment['number'] }}</strong><span>ساکن: {{ $apartment['resident']['name'] ?? 'تخصیص داده نشده' }}</span></div></article>
+                @empty
+                    <div class="empty-state">هنوز واحدی به‌عنوان مالک به شما اختصاص داده نشده است.</div>
+                @endforelse
+            </div>
+        </section>
     @else
         <a href="{{ route('notifications.index') }}" wire:navigate class="module-link">
             <div class="card-icon violet">●</div>
@@ -91,6 +110,11 @@
         <a href="{{ route('buildings.index') }}" wire:navigate class="module-link">
             <div class="card-icon blue">⌂</div>
             <div><strong>مدیریت ساختمان‌ها</strong><span>مشاهده، افزودن و ویرایش ساختمان‌ها</span></div>
+            <b>‹</b>
+        </a>
+        <a href="{{ route('owners.index') }}" wire:navigate class="module-link">
+            <div class="card-icon green">♙</div>
+            <div><strong>مدیریت مالکین</strong><span>ثبت مالک و مشاهده واحدهای تحت مالکیت</span></div>
             <b>‹</b>
         </a>
 

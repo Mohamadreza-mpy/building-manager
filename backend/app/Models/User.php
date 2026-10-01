@@ -17,6 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
     'mobile',
     'password',
     'role',
+    'created_by',
 ])]
 #[Hidden([
     'password',
@@ -43,6 +44,16 @@ class User extends Authenticatable
     public function apartments(): HasMany
     {
         return $this->hasMany(Apartment::class, 'resident_id');
+    }
+
+    public function ownedApartments(): HasMany
+    {
+        return $this->hasMany(Apartment::class, 'owner_id');
+    }
+
+    public function createdOwners(): HasMany
+    {
+        return $this->hasMany(User::class, 'created_by');
     }
 
     public function deviceTokens(): HasMany

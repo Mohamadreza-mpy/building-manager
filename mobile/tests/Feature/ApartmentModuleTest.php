@@ -45,7 +45,10 @@ class ApartmentModuleTest extends TestCase
 
     public function test_manager_can_create_an_apartment(): void
     {
-        Http::fake(['*/buildings/2/apartments' => Http::response($this->success($this->apartment(12, '۲۰۱')), 201)]);
+        Http::fake([
+            '*/owners' => Http::response($this->success([])),
+            '*/buildings/2/apartments' => Http::response($this->success($this->apartment(12, '۲۰۱')), 201),
+        ]);
 
         Livewire::test(Form::class, ['building' => 2])
             ->set('number', '۲۰۱')
@@ -65,6 +68,10 @@ class ApartmentModuleTest extends TestCase
     public function test_manager_can_edit_an_apartment(): void
     {
         Http::fake(function (Request $request) {
+            if (str_ends_with($request->url(), '/owners')) {
+                return Http::response($this->success([]));
+            }
+
             $number = $request->method() === 'PUT' ? '۳۰۲' : '۳۰۱';
 
             return Http::response($this->success($this->apartment(20, $number)));
@@ -108,7 +115,8 @@ class ApartmentModuleTest extends TestCase
             ->call('save')
             ->assertHasErrors(['number' => 'required']);
 
-        Http::assertNothingSent();
+        Http::assertSentCount(1);
+        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/owners'));
     }
 
     private function success(mixed $data): array
@@ -126,11 +134,13 @@ class ApartmentModuleTest extends TestCase
         return [
             'id' => $id,
             'building_id' => 2,
+            'owner_id' => null,
             'resident_id' => null,
             'number' => $number,
             'floor' => 1,
             'area' => 85.5,
             'resident' => null,
+            'owner' => null,
             'building' => ['id' => 2, 'name' => 'ساختمان آفتاب'],
         ];
     }

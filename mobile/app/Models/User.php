@@ -39,6 +39,7 @@ final readonly class User
         return match ($this->role) {
             'admin' => 'مدیر سامانه',
             'manager' => 'مدیر ساختمان',
+            'owner' => 'مالک',
             'resident' => 'ساکن',
             default => 'کاربر',
         };

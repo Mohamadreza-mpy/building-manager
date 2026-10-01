@@ -20,6 +20,8 @@ class Home extends Component
 
     public bool $isResident = false;
 
+    public bool $isOwner = false;
+
     public ?string $updatedAt = null;
 
     public function mount(AuthService $auth, DashboardService $dashboardService): void
@@ -72,6 +74,7 @@ class Home extends Component
             $dashboard = $service->load();
             $this->dashboard = $dashboard->data;
             $this->isResident = $dashboard->isResident();
+            $this->isOwner = $dashboard->isOwner();
             $this->updatedAt = now()->format('H:i');
         } catch (ApiException $exception) {
             $this->errorMessage = $exception->getMessage();

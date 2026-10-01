@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ResidentRequestController;
 use Illuminate\Support\Facades\Route;
@@ -44,5 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/notifications/{notification}/read', [NotificationController::class, 'read']);
     Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
     Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
+    Route::get('/owners', [OwnerController::class, 'index']);
+    Route::post('/owners', [OwnerController::class, 'store']);
     Route::get('/buildings/{building}/reports/summary', [ReportController::class, 'summary']);
 });

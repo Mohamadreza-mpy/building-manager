@@ -16,8 +16,14 @@ class StoreApartmentRequest extends FormRequest
     public function rules(): array
     {
         $buildingId = $this->route('building')?->id;
+        $ownerRule = Rule::exists('users', 'id')->where('role', 'owner');
+
+        if ($this->user()?->role === 'manager') {
+            $ownerRule->where('created_by', $this->user()->id);
+        }
 
         return [
+            'owner_id' => ['nullable', $ownerRule],
             'resident_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'resident')],
             'number' => ['required', 'string', 'max:20', Rule::unique('apartments')->where('building_id', $buildingId)],
             'floor' => ['nullable', 'integer'],
@@ -28,6 +34,7 @@ class StoreApartmentRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'owner_id.exists' => 'مالک انتخاب‌شده معتبر نیست.',
             'resident_id.exists' => 'ساکن انتخاب‌شده معتبر نیست.',
             'number.required' => 'وارد کردن شماره واحد الزامی است.',
             'number.string' => 'شماره واحد باید متن باشد.',
@@ -42,6 +49,6 @@ class StoreApartmentRequest extends FormRequest
 
     public function attributes(): array
     {
-        return ['resident_id' => 'ساکن', 'number' => 'شماره واحد', 'floor' => 'طبقه', 'area' => 'مساحت'];
+        return ['owner_id' => 'مالک', 'resident_id' => 'ساکن', 'number' => 'شماره واحد', 'floor' => 'طبقه', 'area' => 'مساحت'];
     }
 }

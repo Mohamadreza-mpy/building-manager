@@ -15,4 +15,9 @@ final readonly class DashboardData
     {
         return $this->role === 'resident';
     }
+
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
 }

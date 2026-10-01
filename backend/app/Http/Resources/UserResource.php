@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'mobile' => $this->mobile,
             'email' => $this->email,
             'role' => $this->role,
+            'owned_apartments_count' => $this->whenCounted('ownedApartments'),
         ];
     }
 }

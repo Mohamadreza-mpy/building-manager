@@ -13,9 +13,31 @@ class DashboardService
 {
     public function for(User $user): array
     {
-        return $user->role === 'resident'
-            ? $this->residentDashboard($user)
-            : $this->managementDashboard($user);
+        return match ($user->role) {
+            'resident' => $this->residentDashboard($user),
+            'owner' => $this->ownerDashboard($user),
+            default => $this->managementDashboard($user),
+        };
+    }
+
+    private function ownerDashboard(User $user): array
+    {
+        $apartments = Apartment::query()
+            ->with(['building:id,name,address', 'resident:id,name,mobile'])
+            ->where('owner_id', $user->id)
+            ->orderBy('building_id')
+            ->orderBy('number')
+            ->get();
+
+        return [
+            'role' => 'owner',
+            'owned_apartments_count' => $apartments->count(),
+            'owned_apartments' => $apartments->map(fn (Apartment $apartment) => [
+                ...$apartment->only(['id', 'building_id', 'number', 'floor', 'area']),
+                'building' => $apartment->building?->only(['id', 'name', 'address']),
+                'resident' => $apartment->resident?->only(['id', 'name', 'mobile']),
+            ])->all(),
+        ];
     }
 
     private function managementDashboard(User $user): array

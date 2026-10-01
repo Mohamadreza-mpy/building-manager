@@ -15,8 +15,14 @@ class UpdateApartmentRequest extends FormRequest
     public function rules(): array
     {
         $apartment = $this->route('apartment');
+        $ownerRule = Rule::exists('users', 'id')->where('role', 'owner');
+
+        if ($this->user()?->role === 'manager') {
+            $ownerRule->where('created_by', $this->user()->id);
+        }
 
         return [
+            'owner_id' => ['sometimes', 'nullable', $ownerRule],
             'resident_id' => ['sometimes', 'nullable', Rule::exists('users', 'id')->where('role', 'resident')],
             'number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('apartments')->where('building_id', $apartment?->building_id)->ignore($apartment)],
             'floor' => ['sometimes', 'nullable', 'integer'],

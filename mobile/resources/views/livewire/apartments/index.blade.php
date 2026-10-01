@@ -22,7 +22,7 @@
                         {{ isset($apartment['floor']) ? 'طبقه '.$apartment['floor'] : 'طبقه ثبت نشده' }}
                         @if(isset($apartment['area'])) · {{ $apartment['area'] }} مترمربع @endif
                     </span>
-                    <small>{{ $apartment['resident']['name'] ?? 'بدون ساکن' }}</small>
+                    <small>مالک: {{ $apartment['owner']['name'] ?? 'تخصیص داده نشده' }} · ساکن: {{ $apartment['resident']['name'] ?? 'تخصیص داده نشده' }}</small>
                 </div>
                 <b>‹</b>
             </a>

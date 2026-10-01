@@ -15,6 +15,7 @@
                 <div><dt>ساختمان</dt><dd>{{ $item['building']['name'] ?? 'ساختمان' }}</dd></div>
                 <div><dt>طبقه</dt><dd>{{ $item['floor'] ?? 'ثبت نشده' }}</dd></div>
                 <div><dt>مساحت</dt><dd>{{ isset($item['area']) ? $item['area'].' مترمربع' : 'ثبت نشده' }}</dd></div>
+                <div><dt>مالک</dt><dd>{{ $item['owner']['name'] ?? 'تخصیص داده نشده' }}</dd></div>
                 <div><dt>ساکن</dt><dd>{{ $item['resident']['name'] ?? 'تخصیص داده نشده' }}</dd></div>
             </dl>
         </section>

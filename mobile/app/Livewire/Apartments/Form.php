@@ -4,6 +4,7 @@ namespace App\Livewire\Apartments;
 
 use App\Exceptions\ApiException;
 use App\Services\ApartmentService;
+use App\Services\OwnerService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -21,10 +22,20 @@ class Form extends Component
 
     public string $area = '';
 
+    public string $ownerId = '';
+
+    public array $owners = [];
+
     public ?string $errorMessage = null;
 
-    public function mount(ApartmentService $service, ?int $building = null, ?int $apartment = null): void
+    public function mount(ApartmentService $service, OwnerService $owners, ?int $building = null, ?int $apartment = null): void
     {
+        try {
+            $this->owners = array_map(fn ($owner) => $owner->toArray(), $owners->all());
+        } catch (ApiException $exception) {
+            $this->errorMessage = $exception->getMessage();
+        }
+
         if ($apartment) {
             $item = $service->find($apartment);
             $this->apartmentId = $item->id;
@@ -32,6 +43,7 @@ class Form extends Component
             $this->number = $item->number;
             $this->floor = $item->floor === null ? '' : (string) $item->floor;
             $this->area = $item->area === null ? '' : (string) $item->area;
+            $this->ownerId = $item->ownerId === null ? '' : (string) $item->ownerId;
 
             return;
         }
@@ -46,6 +58,7 @@ class Form extends Component
             'number' => ['required', 'string', 'max:20'],
             'floor' => ['nullable', 'integer'],
             'area' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'ownerId' => ['nullable', 'integer'],
         ], [
             'number.required' => 'وارد کردن شماره واحد الزامی است.',
             'number.max' => 'شماره واحد نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
@@ -59,6 +72,7 @@ class Form extends Component
             'number' => $data['number'],
             'floor' => filled($data['floor']) ? (int) $data['floor'] : null,
             'area' => filled($data['area']) ? (float) $data['area'] : null,
+            'owner_id' => filled($data['ownerId']) ? (int) $data['ownerId'] : null,
         ];
 
         try {
@@ -70,6 +84,7 @@ class Form extends Component
             $this->redirectRoute('apartments.show', ['apartment' => $item->id], navigate: true);
         } catch (ApiException $exception) {
             foreach ($exception->errors as $field => $messages) {
+                $field = $field === 'owner_id' ? 'ownerId' : $field;
                 foreach ((array) $messages as $message) {
                     $this->addError($field, (string) $message);
                 }
