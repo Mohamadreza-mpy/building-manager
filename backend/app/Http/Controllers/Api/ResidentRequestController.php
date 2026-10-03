@@ -25,7 +25,7 @@ class ResidentRequestController extends Controller
 
     public function store(StoreResidentRequest $request): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'درخواست با موفقیت ثبت شد.', 'data' => new RequestResource($this->service->create($request->validated()))], 201);
+        return response()->json(['success' => true, 'message' => 'درخواست با موفقیت ثبت شد.', 'data' => new RequestResource($this->service->create($request->user(), $request->validated()))], 201);
     }
 
     public function update(RespondResidentRequest $request, ResidentRequest $residentRequest): JsonResponse

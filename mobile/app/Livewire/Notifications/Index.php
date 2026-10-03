@@ -102,6 +102,7 @@ class Index extends Component
             'charge_receipt_submitted' => isset($notification['meta']['charge_id']) ? route('charges.show', $notification['meta']['charge_id']) : null,
             'charge_receipt_approved' => isset($notification['meta']['charge_id']) ? route('charges.show', $notification['meta']['charge_id']) : null,
             'request_answered' => route('requests.index'),
+            'resident_request_created' => isset($notification['meta']['request_id']) ? route('requests.respond', $notification['meta']['request_id']) : route('requests.index'),
             default => null,
         };
     }

@@ -11,12 +11,20 @@ class ResidentRequestService
 {
     public function list(User $user): LengthAwarePaginator
     {
-        return ResidentRequest::query()->with('apartment.building')->when($user->role === 'resident', fn ($q) => $q->whereHas('apartment', fn ($a) => $a->where('resident_id', $user->id)))->when($user->role === 'manager', fn ($q) => $q->whereHas('apartment.building', fn ($b) => $b->where('manager_id', $user->id)))->latest()->paginate(20);
+        return ResidentRequest::query()->with(['apartment.building', 'apartment.resident'])->when($user->role === 'resident', fn ($q) => $q->whereHas('apartment', fn ($a) => $a->where('resident_id', $user->id)))->when($user->role === 'manager', fn ($q) => $q->whereHas('apartment.building', fn ($b) => $b->where('manager_id', $user->id)))->latest()->paginate(20);
     }
 
-    public function create(array $data): ResidentRequest
+    public function create(User $resident, array $data): ResidentRequest
     {
-        return ResidentRequest::create($data)->refresh()->load('apartment.building');
+        $item = ResidentRequest::create($data)->refresh()->load(['apartment.building.manager', 'apartment.resident']);
+        $item->apartment->building->manager?->notify(new InAppNotification(
+            'resident_request_created',
+            'درخواست جدید ساکن',
+            "{$resident->name} برای واحد {$item->apartment->number} درخواست «{$item->title}» ثبت کرد.",
+            ['request_id' => $item->id],
+        ));
+
+        return $item;
     }
 
     public function respond(ResidentRequest $item, array $data): ResidentRequest
