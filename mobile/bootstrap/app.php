@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureManagementRole;
 use App\Http\Middleware\EnsureMobileAuthenticated;
+use App\Http\Middleware\EnsureChargeViewerRole;
 use App\Http\Middleware\EnsurePersonalChargeRole;
 use App\Http\Middleware\EnsureResidentRole;
 use Illuminate\Foundation\Application;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'mobile.auth' => EnsureMobileAuthenticated::class,
             'mobile.management' => EnsureManagementRole::class,
+            'mobile.charge-viewer' => EnsureChargeViewerRole::class,
             'mobile.personal-charge' => EnsurePersonalChargeRole::class,
             'mobile.resident' => EnsureResidentRole::class,
         ]);

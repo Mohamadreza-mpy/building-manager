@@ -19,8 +19,6 @@ class Index extends Component
 
     public bool $isResident = false;
 
-    public bool $isOwner = false;
-
     public array $charges = [];
 
     public ?string $errorMessage = null;
@@ -30,7 +28,6 @@ class Index extends Component
         $this->buildingId = $building;
         $role = $auth->currentUser()?->role;
         $this->isResident = $role === 'resident';
-        $this->isOwner = $role === 'owner';
         $this->loadCharges($charges, $buildings);
     }
 
@@ -54,7 +51,7 @@ class Index extends Component
         $this->errorMessage = null;
 
         try {
-            if ($this->isResident || $this->isOwner) {
+            if ($this->isResident) {
                 $items = $charges->mine();
             } else {
                 abort_unless($this->buildingId, 404);

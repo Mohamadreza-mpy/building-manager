@@ -24,6 +24,7 @@ class Index extends Component
 
     public function searchOwners(OwnerService $service): void
     {
+        $this->search = trim($this->search);
         $this->loadOwners($service);
     }
 

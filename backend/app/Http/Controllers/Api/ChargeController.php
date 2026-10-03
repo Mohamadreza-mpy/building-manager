@@ -27,11 +27,9 @@ class ChargeController extends Controller
 
     public function myCharges(Request $request): AnonymousResourceCollection
     {
-        abort_unless(in_array($request->user()->role, ['resident', 'owner'], true), 403);
+        abort_unless($request->user()->role === 'resident', 403);
 
-        $charges = $request->user()->role === 'owner'
-            ? $this->service->listForOwner($request->user())
-            : $this->service->listForResident($request->user());
+        $charges = $this->service->listForResident($request->user());
 
         return ChargeResource::collection($charges)->additional(['success' => true, 'message' => 'فهرست شارژهای شما دریافت شد.']);
     }

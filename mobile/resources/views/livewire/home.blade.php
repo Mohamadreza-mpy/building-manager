@@ -83,11 +83,6 @@
             <div><strong>اعلان‌ها</strong><span>رویدادها و پیام‌های جدید</span></div>
             <b>‹</b>
         </a>
-        <a href="{{ route('charges.mine') }}" wire:navigate class="module-link">
-            <div class="card-icon amber">﷼</div>
-            <div><strong>شارژ واحدهای من</strong><span>مشاهده شارژ و ارسال رسید پرداخت</span></div>
-            <b>‹</b>
-        </a>
         <section class="stats-grid" aria-label="خلاصه وضعیت مالک">
             <article class="stat-card wide"><div class="card-icon blue">⌂</div><span>واحدهای تحت مالکیت</span><strong>{{ $this->number($dashboard['owned_apartments_count'] ?? 0) }}</strong><small>واحد ثبت‌شده</small></article>
         </section>

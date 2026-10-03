@@ -24,6 +24,7 @@ class Index extends Component
 
     public function searchResidents(ResidentService $service): void
     {
+        $this->search = trim($this->search);
         $this->loadResidents($service);
     }
 

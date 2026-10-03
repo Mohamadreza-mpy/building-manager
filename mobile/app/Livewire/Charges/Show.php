@@ -22,8 +22,6 @@ class Show extends Component
 
     public bool $isResident = false;
 
-    public bool $isOwner = false;
-
     public bool $isManager = false;
 
     public $receipt = null;
@@ -35,7 +33,6 @@ class Show extends Component
         $this->chargeId = $charge;
         $role = $auth->currentUser()?->role;
         $this->isResident = $role === 'resident';
-        $this->isOwner = $role === 'owner';
         $this->isManager = in_array($role, ['manager', 'admin'], true);
 
         try {

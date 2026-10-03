@@ -34,7 +34,7 @@ Route::get('/login', Login::class)->name('login');
 
 Route::middleware('mobile.auth')->group(function () {
     Route::get('/home', Home::class)->name('home');
-    Route::get('/charges/{charge}', ChargeShow::class)->whereNumber('charge')->name('charges.show');
+    Route::middleware('mobile.charge-viewer')->get('/charges/{charge}', ChargeShow::class)->whereNumber('charge')->name('charges.show');
     Route::middleware('mobile.personal-charge')->get('/charges', ChargeIndex::class)->name('charges.mine');
     Route::get('/buildings/{building}/expenses', ExpenseIndex::class)->whereNumber('building')->name('expenses.index');
     Route::get('/buildings/{building}/announcements', AnnouncementIndex::class)->whereNumber('building')->name('announcements.index');

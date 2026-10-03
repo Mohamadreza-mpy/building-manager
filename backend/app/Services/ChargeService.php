@@ -14,17 +14,12 @@ class ChargeService
 {
     public function list(Building $building): LengthAwarePaginator
     {
-        return $building->charges()->with(['apartment.resident', 'apartment.owner'])->latest('month')->paginate(20);
+        return $building->charges()->with('apartment.resident')->latest('month')->paginate(20);
     }
 
     public function listForResident(User $user): LengthAwarePaginator
     {
         return Charge::query()->with('apartment')->whereHas('apartment', fn ($query) => $query->where('resident_id', $user->id))->latest('month')->paginate(20);
-    }
-
-    public function listForOwner(User $user): LengthAwarePaginator
-    {
-        return Charge::query()->with('apartment')->whereHas('apartment', fn ($query) => $query->where('owner_id', $user->id))->latest('month')->paginate(20);
     }
 
     public function create(Building $building, array $data): Charge
@@ -39,28 +34,28 @@ class ChargeService
 
     public function find(Charge $charge): Charge
     {
-        return $charge->load(['apartment.resident', 'apartment.owner']);
+        return $charge->load('apartment.resident');
     }
 
     public function update(Charge $charge, array $data): Charge
     {
         $charge->update($data);
 
-        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
+        return $charge->refresh()->load('apartment.resident');
     }
 
     public function approveReceipt(Charge $charge): Charge
     {
         $charge->update(['status' => 'paid', 'paid_at' => now()]);
-        $charge->loadMissing('apartment.owner');
-        $charge->apartment->owner?->notify(new InAppNotification(
+        $charge->loadMissing('apartment.resident');
+        $charge->apartment->resident?->notify(new InAppNotification(
             'charge_receipt_approved',
             'پرداخت شارژ تأیید شد',
             "رسید شارژ {$charge->title} واحد {$charge->apartment->number} تأیید شد.",
             ['charge_id' => $charge->id],
         ));
 
-        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
+        return $charge->refresh()->load('apartment.resident');
     }
 
     public function submitReceipt(Charge $charge, UploadedFile $image): Charge
@@ -82,6 +77,6 @@ class ChargeService
             ['charge_id' => $charge->id],
         ));
 
-        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
+        return $charge->refresh()->load('apartment.resident');
     }
 }
