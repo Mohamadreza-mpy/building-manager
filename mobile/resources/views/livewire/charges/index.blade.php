@@ -18,7 +18,11 @@
         @forelse ($charges as $charge)
             <a href="{{ route('charges.show', $charge['id']) }}" wire:navigate class="charge-card">
                 <div class="charge-card-top">
-                    <div><strong>{{ $charge['title'] }}</strong><span>واحد {{ $charge['apartment']['number'] ?? '—' }} · {{ $charge['month'] }}</span></div>
+                    <div><strong>{{ $charge['title'] }}</strong><span>واحد {{ $charge['apartment']['number'] ?? '—' }} · {{ $charge['month'] }}</span>
+                        @if(!($isResident || $isOwner) && ($charge['payment_receipt_url'] ?? null) && $charge['status'] !== 'paid')
+                            <small class="receipt-review-hint">رسید ارسال شده · برای بررسی باز کنید</small>
+                        @endif
+                    </div>
                     <span class="status-badge status-{{ $charge['status'] }}">{{ $charge['status_label'] }}</span>
                 </div>
                 <div class="charge-amount"><strong>{{ $this->formatAmount($charge['amount']) }}</strong><span>ریال</span><b>‹</b></div>

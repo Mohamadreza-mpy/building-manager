@@ -99,6 +99,8 @@ class Index extends Component
     {
         return match ($notification['type']) {
             'charge_created' => isset($notification['meta']['charge_id']) ? route('charges.show', $notification['meta']['charge_id']) : null,
+            'charge_receipt_submitted' => isset($notification['meta']['charge_id']) ? route('charges.show', $notification['meta']['charge_id']) : null,
+            'charge_receipt_approved' => isset($notification['meta']['charge_id']) ? route('charges.show', $notification['meta']['charge_id']) : null,
             'request_answered' => route('requests.index'),
             default => null,
         };

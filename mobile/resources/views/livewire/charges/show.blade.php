@@ -24,7 +24,14 @@
             <section class="detail-card">
                 <div class="section-heading"><h2>رسید پرداخت</h2><span>{{ $item['status'] === 'paid' ? 'تأیید شده' : 'در انتظار بررسی مدیر' }}</span></div>
                 <a href="{{ $item['payment_receipt_url'] }}" target="_blank" rel="noopener"><img src="{{ $item['payment_receipt_url'] }}" alt="تصویر رسید پرداخت" style="width:100%;max-height:420px;object-fit:contain;border-radius:16px"></a>
+                <a href="{{ $item['payment_receipt_url'] }}" target="_blank" rel="noopener" class="text-action">باز کردن یا دریافت فایل رسید</a>
                 @if($item['receipt_submitted_at'])<small>زمان ارسال: {{ $this->formatDate($item['receipt_submitted_at']) }}</small>@endif
+                @if($isManager && $item['status'] !== 'paid')
+                    <button type="button" class="primary-button" wire:click="approveReceipt" wire:confirm="رسید را تأیید و وضعیت شارژ را پرداخت‌شده ثبت می‌کنید؟" wire:loading.attr="disabled" wire:target="approveReceipt">
+                        <span wire:loading.remove wire:target="approveReceipt">تأیید پرداخت</span>
+                        <span wire:loading.flex wire:target="approveReceipt" class="loading-label"><i class="spinner"></i>در حال تأیید…</span>
+                    </button>
+                @endif
             </section>
         @endif
 

@@ -24,6 +24,8 @@ class Show extends Component
 
     public bool $isOwner = false;
 
+    public bool $isManager = false;
+
     public $receipt = null;
 
     public ?string $errorMessage = null;
@@ -34,6 +36,7 @@ class Show extends Component
         $role = $auth->currentUser()?->role;
         $this->isResident = $role === 'resident';
         $this->isOwner = $role === 'owner';
+        $this->isManager = in_array($role, ['manager', 'admin'], true);
 
         try {
             $this->item = $service->find($charge)->toArray();
@@ -68,6 +71,22 @@ class Show extends Component
                     $this->addError($field, (string) $message);
                 }
             }
+            $this->errorMessage = $exception->getMessage();
+        }
+    }
+
+    public function approveReceipt(ChargeService $service): void
+    {
+        if (! ($this->item['payment_receipt_url'] ?? null)) {
+            $this->errorMessage = 'برای این شارژ رسیدی ثبت نشده است.';
+
+            return;
+        }
+
+        try {
+            $this->item = $service->approveReceipt($this->chargeId)->toArray();
+            session()->flash('success_message', 'رسید تأیید شد و وضعیت شارژ به پرداخت‌شده تغییر کرد.');
+        } catch (ApiException $exception) {
             $this->errorMessage = $exception->getMessage();
         }
     }

@@ -57,4 +57,12 @@ class ChargeController extends Controller
     {
         return response()->json(['success' => true, 'message' => 'رسید پرداخت برای بررسی مدیر ثبت شد.', 'data' => new ChargeResource($this->service->submitReceipt($charge, $request->file('image')))]);
     }
+
+    public function approveReceipt(Request $request, Charge $charge): JsonResponse
+    {
+        $this->authorize('update', $charge);
+        abort_unless($charge->payment_receipt, 422, 'برای این شارژ رسیدی ثبت نشده است.');
+
+        return response()->json(['success' => true, 'message' => 'رسید پرداخت تأیید شد.', 'data' => new ChargeResource($this->service->approveReceipt($charge))]);
+    }
 }

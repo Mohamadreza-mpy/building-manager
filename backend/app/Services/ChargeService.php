@@ -46,7 +46,21 @@ class ChargeService
     {
         $charge->update($data);
 
-        return $charge->refresh()->load('apartment.resident');
+        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
+    }
+
+    public function approveReceipt(Charge $charge): Charge
+    {
+        $charge->update(['status' => 'paid', 'paid_at' => now()]);
+        $charge->loadMissing('apartment.owner');
+        $charge->apartment->owner?->notify(new InAppNotification(
+            'charge_receipt_approved',
+            'پرداخت شارژ تأیید شد',
+            "رسید شارژ {$charge->title} واحد {$charge->apartment->number} تأیید شد.",
+            ['charge_id' => $charge->id],
+        ));
+
+        return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
     }
 
     public function submitReceipt(Charge $charge, UploadedFile $image): Charge
@@ -59,6 +73,14 @@ class ChargeService
             'payment_receipt' => $image->store('charge-receipts', 'public'),
             'receipt_submitted_at' => now(),
         ]);
+
+        $charge->loadMissing('building.manager', 'apartment');
+        $charge->building->manager?->notify(new InAppNotification(
+            'charge_receipt_submitted',
+            'رسید پرداخت جدید',
+            "برای شارژ {$charge->title} واحد {$charge->apartment->number} رسید ارسال شده است.",
+            ['charge_id' => $charge->id],
+        ));
 
         return $charge->refresh()->load(['apartment.resident', 'apartment.owner']);
     }
